@@ -34,6 +34,7 @@ path = [
   "opendatahub-static-generator-worker/Properties/launchSettings.json",
   "opendatahub-static-generator-cli/opendatahub-static-generator-cli.csproj",
   "opendatahub-static-generator-cli/appsettings.json",
+  "opendatahub-static-generator-cli/appsettings.Development.json",
   ".vscode/launch.json",
   ".vscode/tasks.json",
   "data/.gitkeep"
