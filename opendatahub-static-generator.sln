@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "opendatahub-static-api", "opendatahub-static-api\opendatahub-static-api.csproj", "{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "opendatahub-static-generator-worker", "opendatahub-static-generator-worker\opendatahub-static-generator-worker.csproj", "{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "opendatahub-static-generator-cli", "opendatahub-static-generator-cli\opendatahub-static-generator-cli.csproj", "{25EEC09E-95D5-4A07-B529-574B85C6D97F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|x64.Build.0 = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Debug|x86.Build.0 = Debug|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|x64.ActiveCfg = Release|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|x64.Build.0 = Release|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|x86.ActiveCfg = Release|Any CPU
+		{3FDD448E-BEAD-4289-BBF7-0D3454FA5CCA}.Release|x86.Build.0 = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|x64.Build.0 = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Debug|x86.Build.0 = Debug|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|x64.ActiveCfg = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|x64.Build.0 = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|x86.ActiveCfg = Release|Any CPU
+		{2FD5CE93-65AE-43E3-B559-38EC8F76E62C}.Release|x86.Build.0 = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|x64.Build.0 = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Debug|x86.Build.0 = Debug|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|x64.ActiveCfg = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|x64.Build.0 = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|x86.ActiveCfg = Release|Any CPU
+		{25EEC09E-95D5-4A07-B529-574B85C6D97F}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

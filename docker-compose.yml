@@ -1,0 +1,29 @@
+services:
+
+  static-api:
+    build:
+      context: .
+      dockerfile: opendatahub-static-api/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - static-data:/data
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      DataPath: /data
+    restart: unless-stopped
+    depends_on:
+      - generator-worker
+
+  generator-worker:
+    build:
+      context: .
+      dockerfile: opendatahub-static-generator-worker/Dockerfile
+    volumes:
+      - static-data:/data
+    environment:
+      Sync__OutputPath: /data
+    restart: unless-stopped
+
+volumes:
+  static-data:
