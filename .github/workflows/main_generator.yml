@@ -31,9 +31,9 @@ jobs:
       with:
         dotnet-version: '8.0.x'        
     - name: Restore dependencies
-      run: dotnet restore opendatahub-static-generator-worker.sln
-    - name: Build opendatahub-static-generator-worker Solution
-      run: dotnet build opendatahub-static-generator-worker.sln --no-restore
+      run: dotnet restore opendatahub-static-generator.sln
+    - name: Build opendatahub-static-generator Solution
+      run: dotnet build opendatahub-static-generator.sln --no-restore
 
   deploy-test-importer:
     runs-on: ubuntu-22.04
