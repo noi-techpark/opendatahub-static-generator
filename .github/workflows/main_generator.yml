@@ -1,0 +1,75 @@
+name: CI/CD Worker
+
+on:
+  push:
+    paths:
+      - "opendatahub-static-generator-worker/**"      
+      - ".github/workflows/main_generator.yml"
+      - "infrastructure/docker-compose.worker.run.yml"
+  pull_request:
+    paths:
+      - "opendatahub-static-generator-worker/**"      
+      - ".github/workflows/main_generator.yml"
+
+env:
+  PROJECT_NAME: odh-static-generator-worker
+  DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}-worker
+  DOCKER_TAG: ${{ github.sha }}
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: REUSE Compliance Check
+      uses: fsfe/reuse-action@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'        
+    - name: Restore dependencies
+      run: dotnet restore opendatahub-static-generator-worker.sln
+    - name: Build opendatahub-static-generator-worker Solution
+      run: dotnet build opendatahub-static-generator-worker.sln --no-restore
+
+  deploy-test-importer:
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/main'
+
+    needs: test
+    concurrency: deploy-test-importer
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Create .env file
+        uses: noi-techpark/github-actions/env-file@v2
+        env:
+          X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}
+          X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
+          X_DOCKER_TAG: ${{ env.DOCKER_TAG }}          
+
+          X_ASPNETCORE_ENVIRONMENT: "Development"
+     
+      - name: Build and push 
+        uses: noi-techpark/github-actions/docker-build-and-push@v2
+        with:
+          docker-username: ${{ github.actor }}
+          docker-password: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: opendatahub-static-generator-worker
+          docker-compose-file: docker-compose.yml
+
+      - name: Deploy application
+        uses: noi-techpark/github-actions/docker-deploy@v2
+        with:
+          hosts: 'test'
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          docker-username: 'noi-techpark-bot'
+          docker-password: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          project-name: ${{ env.PROJECT_NAME }}
+          playbook-file: 'deploy.importer.yml'

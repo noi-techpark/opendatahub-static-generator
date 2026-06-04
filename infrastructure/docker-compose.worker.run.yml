@@ -1,0 +1,11 @@
+services:
+  generator-worker:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    volumes:
+      - static-data:/data
+    environment:
+      Sync__OutputPath: /data
+    restart: unless-stopped
+
+volumes:
+  static-data:

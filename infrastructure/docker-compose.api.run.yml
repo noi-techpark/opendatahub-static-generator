@@ -1,0 +1,13 @@
+services:
+
+
+  static-api:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    ports:
+      - "${SERVER_PORT}:8080"
+    volumes:
+      - static-data:/data
+    environment:
+      ASPNETCORE_HTTP_PORTS: "8080"
+      DataPath: /data
+    restart: unless-stopped
