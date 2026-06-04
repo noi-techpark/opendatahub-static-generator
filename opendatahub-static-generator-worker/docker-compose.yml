@@ -1,0 +1,14 @@
+services:
+
+  generator-worker:
+    build:
+      context: .
+      dockerfile: opendatahub-static-generator-worker/Dockerfile
+    volumes:
+      - static-data:/data
+    environment:
+      Sync__OutputPath: /data
+    restart: unless-stopped
+
+volumes:
+  static-data:
