@@ -16,6 +16,7 @@ var syncConfig = builder.Configuration.GetSection("Sync").Get<SyncConfig>() ?? n
 
 builder.Services.AddQuartz(q =>
 {
+    //Go trough each rules
     foreach (var rule in syncConfig.Rules)
     {
         var jobKey = new JobKey(rule.Name, "sync");
