@@ -27,11 +27,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '9.0.x'
     - name: Restore dependencies
-      run: dotnet restore opendatahub-static-generator
+      run: dotnet restore opendatahub-static-generator.sln
     - name: Build opendatahub-static-generator Solution
-      run: dotnet build opendatahub-static-generator --no-restore
+      run: dotnet build opendatahub-static-generator.sln --no-restore
 
   deploy-test-api:
     runs-on: ubuntu-22.04
