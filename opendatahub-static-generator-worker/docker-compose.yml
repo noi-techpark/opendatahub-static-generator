@@ -3,7 +3,7 @@ services:
   generator-worker:
     build:
       context: .
-      dockerfile: opendatahub-static-generator-worker/Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - static-data:/data
     environment:
