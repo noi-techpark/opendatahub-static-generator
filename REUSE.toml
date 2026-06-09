@@ -35,6 +35,7 @@ path = [
   "opendatahub-static-generator-worker/opendatahub-static-generator-worker.csproj",
   "opendatahub-static-generator-worker/appsettings.json",
   "opendatahub-static-generator-worker/appsettings.Development.json",
+  "opendatahub-static-generator-worker/appsettings.Production.json",
   "opendatahub-static-generator-worker/Properties/launchSettings.json",
   "opendatahub-static-generator-cli/opendatahub-static-generator-cli.csproj",
   "opendatahub-static-generator-cli/appsettings.json",
