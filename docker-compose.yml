@@ -2,8 +2,8 @@ services:
 
   static-api:
     build:
-      context: .
-      dockerfile: opendatahub-static-api/Dockerfile
+      context: ./opendatahub-static-api
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     volumes:
@@ -17,8 +17,8 @@ services:
 
   generator-worker:
     build:
-      context: .
-      dockerfile: opendatahub-static-generator-worker/Dockerfile
+      context: ./opendatahub-static-generator-worker
+      dockerfile: Dockerfile
     volumes:
       - static-data:/data
     environment:

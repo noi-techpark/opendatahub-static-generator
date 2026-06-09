@@ -12,8 +12,6 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       DataPath: /data
     restart: unless-stopped
-    depends_on:
-      - generator-worker
 
 volumes:
   static-data:
