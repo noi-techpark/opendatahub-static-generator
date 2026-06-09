@@ -1,4 +1,5 @@
 services:
+
   generator-worker:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
     volumes:
@@ -9,3 +10,4 @@ services:
 
 volumes:
   static-data:
+    name: odh-static-data

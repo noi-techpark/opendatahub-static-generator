@@ -1,6 +1,5 @@
 services:
 
-
   static-api:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
     ports:
@@ -11,3 +10,7 @@ services:
       ASPNETCORE_HTTP_PORTS: "8080"
       DataPath: /data
     restart: unless-stopped
+
+volumes:
+  static-data:
+    name: odh-static-data
