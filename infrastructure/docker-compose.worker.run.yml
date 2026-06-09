@@ -5,6 +5,7 @@ services:
     volumes:
       - static-data:/data
     environment:
+      DOTNET_ENVIRONMENT: ${DOTNET_ENVIRONMENT}
       Sync__OutputPath: /data
     restart: unless-stopped
 

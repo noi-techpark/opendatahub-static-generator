@@ -1,17 +1,13 @@
 services:
 
-  static-api:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+  generator-worker:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
     volumes:
       - static-data:/data
     environment:
-      ASPNETCORE_HTTP_PORTS: "8080"
-      DataPath: /data
+      Sync__OutputPath: /data
     restart: unless-stopped
 
 volumes:
