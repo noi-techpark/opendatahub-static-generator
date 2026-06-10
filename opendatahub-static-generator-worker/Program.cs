@@ -16,30 +16,64 @@ builder.Services.AddScoped<SyncService>();
 
 var syncConfig = builder.Configuration.GetSection("Sync").Get<SyncConfig>() ?? new SyncConfig();
 
+var chainGroups = syncConfig.Rules
+    .Where(r => !string.IsNullOrEmpty(r.ChainGroup))
+    .GroupBy(r => r.ChainGroup!)
+    .ToDictionary(g => g.Key, g => g.ToList());
+
+var unchainedRules = syncConfig.Rules
+    .Where(r => string.IsNullOrEmpty(r.ChainGroup))
+    .ToList();
+
 builder.Services.AddQuartz(q =>
 {
-    foreach (var (rule, index) in syncConfig.Rules.Select((r, i) => (r, i)))
+    // Unchained rules: each gets its own cron and startup triggers
+    foreach (var rule in unchainedRules)
     {
         var jobKey = new JobKey(rule.Name, "sync");
-
         q.AddJob<SyncJob>(opts => opts
             .WithIdentity(jobKey)
             .UsingJobData("RuleName", rule.Name)
             .StoreDurably());
 
-        // Only the first rule gets direct triggers; the rest fire via job chaining
-        if (index == 0)
-        {
+        if (!string.IsNullOrEmpty(rule.CronExpression))
             q.AddTrigger(opts => opts
                 .ForJob(jobKey)
                 .WithIdentity($"{rule.Name}-trigger", "sync")
                 .WithCronSchedule(rule.CronExpression, x => x.WithMisfireHandlingInstructionFireAndProceed()));
 
-            if (rule.RunOnStartup)
-                q.AddTrigger(opts => opts
-                    .ForJob(jobKey)
-                    .WithIdentity($"{rule.Name}-startup-trigger", "sync")
-                    .StartNow());
+        if (rule.RunOnStartup)
+            q.AddTrigger(opts => opts
+                .ForJob(jobKey)
+                .WithIdentity($"{rule.Name}-startup-trigger", "sync")
+                .StartNow());
+    }
+
+    // Chained rules: only the first in each group gets direct triggers; the rest fire via chain
+    foreach (var (_, rules) in chainGroups)
+    {
+        foreach (var (rule, index) in rules.Select((r, i) => (r, i)))
+        {
+            var jobKey = new JobKey(rule.Name, "sync");
+            q.AddJob<SyncJob>(opts => opts
+                .WithIdentity(jobKey)
+                .UsingJobData("RuleName", rule.Name)
+                .StoreDurably());
+
+            if (index == 0)
+            {
+                if (!string.IsNullOrEmpty(rule.CronExpression))
+                    q.AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithIdentity($"{rule.Name}-trigger", "sync")
+                        .WithCronSchedule(rule.CronExpression, x => x.WithMisfireHandlingInstructionFireAndProceed()));
+
+                if (rule.RunOnStartup)
+                    q.AddTrigger(opts => opts
+                        .ForJob(jobKey)
+                        .WithIdentity($"{rule.Name}-startup-trigger", "sync")
+                        .StartNow());
+            }
         }
     }
 });
@@ -48,17 +82,22 @@ builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete
 
 var host = builder.Build();
 
-// Chain jobs sequentially: when each job completes it fires the next one in order
-if (syncConfig.Rules.Count > 1)
+// Build a JobChainingJobListener per group so each chain runs sequentially
+if (chainGroups.Count > 0)
 {
     var schedulerFactory = host.Services.GetRequiredService<ISchedulerFactory>();
     var scheduler = await schedulerFactory.GetScheduler();
-    var chainListener = new JobChainingJobListener("sync-chain");
-    for (var i = 0; i < syncConfig.Rules.Count - 1; i++)
-        chainListener.AddJobChainLink(
-            new JobKey(syncConfig.Rules[i].Name, "sync"),
-            new JobKey(syncConfig.Rules[i + 1].Name, "sync"));
-    scheduler.ListenerManager.AddJobListener(chainListener, GroupMatcher<JobKey>.GroupEquals("sync"));
+
+    foreach (var (group, rules) in chainGroups)
+    {
+        if (rules.Count < 2) continue;
+        var chainListener = new JobChainingJobListener($"sync-chain-{group}");
+        for (var i = 0; i < rules.Count - 1; i++)
+            chainListener.AddJobChainLink(
+                new JobKey(rules[i].Name, "sync"),
+                new JobKey(rules[i + 1].Name, "sync"));
+        scheduler.ListenerManager.AddJobListener(chainListener, GroupMatcher<JobKey>.GroupEquals("sync"));
+    }
 }
 
 await host.RunAsync();
