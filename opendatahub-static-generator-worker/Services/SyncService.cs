@@ -1,5 +1,7 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Unicode;
 using GeneratorWorker.Models;
 
 namespace GeneratorWorker.Services;
@@ -7,7 +9,11 @@ namespace GeneratorWorker.Services;
 /// <summary>Fetches all pages from a configured API endpoint and persists the result as a JSON file.</summary>
 public class SyncService
 {
-    private static readonly JsonSerializerOptions PrettyPrint = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions PrettyPrint = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+    };
 
     private readonly ApiClientService _apiClient;
     private readonly ILogger<SyncService> _logger;
