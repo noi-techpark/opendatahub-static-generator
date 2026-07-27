@@ -1,7 +1,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Unicode;
 using GeneratorWorker.Models;
 
 namespace GeneratorWorker.Services;
@@ -12,7 +11,7 @@ public class SyncService
     private static readonly JsonSerializerOptions PrettyPrint = new()
     {
         WriteIndented = true,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     private readonly ApiClientService _apiClient;
