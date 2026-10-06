@@ -1,0 +1,37 @@
+# Prod environment values for the static-generator-worker chart.
+#
+# image.repository / image.tag / image.pullPolicy are overwritten by the workflow.
+# The sync rules come from appsettings.<DOTNET_ENVIRONMENT>.json baked into the image.
+
+image:
+  repository: ghcr.io/noi-techpark/opendatahub-static-generator/opendatahub-static-generator-worker
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets:
+  - name: container-registry-r
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 20m
+    memory: 512Mi
+  limits:
+    memory: 512Mi
+
+# EFS (ReadWriteMany) so the static-api pod can mount it from any node.
+persistence:
+  enabled: true
+  claimName: static-generator-data
+  storageClass: efs
+  accessMode: ReadWriteMany
+  size: 1Gi
+  mountPath: /data
+
+# Non-secret environment (mirrors infrastructure/docker-compose.worker.run.yml).
+env:
+  DOTNET_ENVIRONMENT: "Production"
+  Sync__OutputPath: "/data"
+
+envSecret: {}

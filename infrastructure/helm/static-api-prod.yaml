@@ -1,0 +1,52 @@
+# Prod environment values for the static-api chart.
+#
+# image.repository / image.tag / image.pullPolicy are overwritten by the workflow.
+# The JSON files are served from the PVC written by the static-generator-worker
+# release (see static-generator-worker-prod.yaml).
+
+image:
+  repository: ghcr.io/noi-techpark/opendatahub-static-generator/opendatahub-static-generator-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets:
+  - name: container-registry-r
+
+replicaCount: 1
+
+# Memory request == limit so the pod is protected from node-pressure eviction.
+# Files are read fully into memory per request; raise if the generated files grow.
+resources:
+  requests:
+    cpu: 20m
+    memory: 512Mi
+  limits:
+    memory: 512Mi
+
+service:
+  type: ClusterIP
+  port: 80
+  targetport: http
+  containerport: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: static.opendatahub.com
+      paths:
+        - path: "/"
+          pathType: Prefix
+
+# Owned by the static-generator-worker release.
+persistence:
+  existingClaim: static-generator-data
+  mountPath: /data
+
+# Non-secret environment (mirrors infrastructure/docker-compose.api.run.yml).
+env:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_HTTP_PORTS: "8080"
+  DataPath: "/data"
+
+envSecret: {}
