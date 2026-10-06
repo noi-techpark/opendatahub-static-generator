@@ -1,0 +1,11 @@
+apiVersion: v2
+name: static-generator-worker
+description: Helm chart for the OpenDataHub Static Generator worker (writes the JSON files)
+
+type: application
+
+# Chart version — bump on chart/template changes.
+version: 1.0.0
+
+# Application version.
+appVersion: "1.0.0"

@@ -6,6 +6,8 @@ on:
       - "opendatahub-static-generator-worker/**"      
       - ".github/workflows/main_generator.yml"
       - "infrastructure/docker-compose.worker.run.yml"
+      - "infrastructure/helm/static-generator-worker/**"
+      - "infrastructure/helm/static-generator-worker-test.yaml"
   pull_request:
     paths:
       - "opendatahub-static-generator-worker/**"      
@@ -35,11 +37,12 @@ jobs:
     - name: Build opendatahub-static-generator Solution
       run: dotnet build opendatahub-static-generator.sln --no-restore
 
+  # Deploy Test (Kubernetes / EKS)
   deploy-test-importer:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
-
     needs: test
+    environment: test
     concurrency: deploy-test-importer
     steps:
       - name: Checkout source code
@@ -47,16 +50,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Create .env file
-        uses: noi-techpark/github-actions/env-file@v2
-        env:
-          X_COMPOSE_PROJECT_NAME: ${{ env.PROJECT_NAME }}
-          X_DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
-          X_DOCKER_TAG: ${{ env.DOCKER_TAG }}          
-
-          X_DOTNET_ENVIRONMENT: "Development"
-     
-      - name: Build and push 
+      - name: Build and push
         uses: noi-techpark/github-actions/docker-build-and-push@v2
         with:
           docker-username: ${{ github.actor }}
@@ -64,15 +58,33 @@ jobs:
           working-directory: opendatahub-static-generator-worker
           docker-compose-file: docker-compose.yml
 
-      - name: Deploy application
-        uses: noi-techpark/github-actions/docker-deploy@v2
+      # https://github.com/shrink/actions-docker-registry-tag
+      - name: Add an "unstable" docker tag
+        uses: shrink/actions-docker-registry-tag@v4
         with:
-          hosts: 'test'
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          docker-username: 'noi-techpark-bot'
-          docker-password: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          project-name: ${{ env.PROJECT_NAME }}
-          playbook-file: 'deploy.worker.yml'
+          registry: ghcr.io
+          repository: ${{ github.repository }}/${{ github.event.repository.name }}-worker
+          target: ${{ env.DOCKER_TAG }}
+          tags: |
+            unstable
+
+      - name: Customize static-generator-worker-test.yaml
+        run: |
+          yq -i '.image.repository="${{ env.DOCKER_IMAGE }}"' infrastructure/helm/static-generator-worker-test.yaml
+          yq -i '.image.tag="${{ env.DOCKER_TAG }}"' infrastructure/helm/static-generator-worker-test.yaml
+          yq -i '.image.pullPolicy="IfNotPresent"' infrastructure/helm/static-generator-worker-test.yaml
+
+      - name: Deploy on cluster
+        uses: noi-techpark/github-actions/helm-deploy@v3
+        with:
+          k8s-name: static-generator-worker
+          k8s-namespace: core
+          chart-path: infrastructure/helm/static-generator-worker
+          values-file: infrastructure/helm/static-generator-worker-test.yaml
+          aws-access-key-id: ${{ secrets[vars.AWS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[vars.AWS_KEY_SECRET] }}
+          aws-eks-cluster-name: aws-main-eu-01
+          aws-region: eu-west-1
 
   deploy-prod-importer:
     runs-on: ubuntu-22.04
