@@ -33,7 +33,7 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: static.opendatahub.com
+    - host: export.api.opendatahub.com
       paths:
         - path: "/"
           pathType: Prefix
