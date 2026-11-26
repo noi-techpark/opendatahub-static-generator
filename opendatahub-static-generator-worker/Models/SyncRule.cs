@@ -35,6 +35,10 @@ public class SyncRule
     /// </summary>
     public string? CronExpression { get; set; }
 
-    /// <summary>When true, the job fires once immediately on startup in addition to the cron schedule.</summary>
+    /// <summary>
+    /// When true, the job fires once immediately on startup in addition to the cron schedule.
+    /// When false, it still fires on startup if its output file (or, for the first rule of a
+    /// chain group, any output file of the group) does not exist yet.
+    /// </summary>
     public bool RunOnStartup { get; set; } = false;
 }

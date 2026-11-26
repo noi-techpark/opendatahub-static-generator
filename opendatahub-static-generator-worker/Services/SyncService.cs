@@ -161,7 +161,7 @@ public class SyncService
         return n is JsonValue v && v.TryGetValue<bool>(out var b) && b;
     }
 
-    private static string ResolveOutputFile(string outputPath, string fileName)
+    internal static string ResolveOutputFile(string outputPath, string fileName)
     {
         if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             fileName += ".json";

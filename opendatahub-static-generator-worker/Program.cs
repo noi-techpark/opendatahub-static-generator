@@ -25,6 +25,27 @@ var unchainedRules = syncConfig.Rules
     .Where(r => string.IsNullOrEmpty(r.ChainGroup))
     .ToList();
 
+// Same resolution as SyncJob: relative paths are resolved from the working directory
+var outputPath = Path.GetFullPath(syncConfig.OutputPath);
+var startupReasons = new List<string>();
+
+// Fire on startup if requested, or if any output file of the rule(s) is missing
+bool ShouldRunOnStartup(SyncRule first, IEnumerable<SyncRule> outputs)
+{
+    if (first.RunOnStartup)
+        return true;
+
+    var missing = outputs
+        .Where(r => !File.Exists(SyncService.ResolveOutputFile(outputPath, r.OutputFileName)))
+        .Select(r => r.OutputFileName)
+        .ToList();
+    if (missing.Count == 0)
+        return false;
+
+    startupReasons.Add($"'{first.Name}' scheduled on startup, missing output: {string.Join(", ", missing)}");
+    return true;
+}
+
 builder.Services.AddQuartz(q =>
 {
     // Unchained rules: each gets its own cron and startup triggers
@@ -42,7 +63,7 @@ builder.Services.AddQuartz(q =>
                 .WithIdentity($"{rule.Name}-trigger", "sync")
                 .WithCronSchedule(rule.CronExpression, x => x.WithMisfireHandlingInstructionFireAndProceed()));
 
-        if (rule.RunOnStartup)
+        if (ShouldRunOnStartup(rule, [rule]))
             q.AddTrigger(opts => opts
                 .ForJob(jobKey)
                 .WithIdentity($"{rule.Name}-startup-trigger", "sync")
@@ -68,7 +89,8 @@ builder.Services.AddQuartz(q =>
                         .WithIdentity($"{rule.Name}-trigger", "sync")
                         .WithCronSchedule(rule.CronExpression, x => x.WithMisfireHandlingInstructionFireAndProceed()));
 
-                if (rule.RunOnStartup)
+                // Starting the first rule runs the whole chain
+                if (ShouldRunOnStartup(rule, rules))
                     q.AddTrigger(opts => opts
                         .ForJob(jobKey)
                         .WithIdentity($"{rule.Name}-startup-trigger", "sync")
@@ -81,6 +103,10 @@ builder.Services.AddQuartz(q =>
 builder.Services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
 var host = builder.Build();
+
+var startupLogger = host.Services.GetRequiredService<ILogger<Program>>();
+foreach (var reason in startupReasons)
+    startupLogger.LogInformation("{Reason}", reason);
 
 // Build a JobChainingJobListener per group so each chain runs sequentially
 if (chainGroups.Count > 0)

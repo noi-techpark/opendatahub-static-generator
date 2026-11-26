@@ -20,13 +20,14 @@ resources:
   limits:
     memory: 256Mi
 
-# EFS (ReadWriteMany) so the static-api pod can mount it from any node.
+# Scaleway File Storage (ReadWriteMany) so the static-api pod can mount it from any node.
+# 25 GB is its minimum size, and sizes must be whole GB (1e9 bytes), hence G, not Gi.
 persistence:
   enabled: true
   claimName: static-generator-data
-  storageClass: efs
+  storageClass: sfs-standard
   accessMode: ReadWriteMany
-  size: 1Gi
+  size: 25G
   mountPath: /data
 
 # Non-secret environment (mirrors infrastructure/docker-compose.worker.run.yml).
